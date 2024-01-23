@@ -14,9 +14,10 @@ export default function CalculatorWithHistory() {
 
     if (!isNaN(num1Value) && !isNaN(num2Value)) {
       if (operation === "+") {
-        setResult(num1Value + num2Value);
+        setResult(`${num1Value} ${operation} ${num2Value} = ${num1Value + num2Value}`);
+        
       } else if (operation === "-") {
-        setResult(num1Value - num2Value);
+        setResult(`${num1Value} ${operation} ${num2Value} = ${num1Value - num2Value}`);
       }
     } else {
       setResult("Syötä kelvolliset numerot");
