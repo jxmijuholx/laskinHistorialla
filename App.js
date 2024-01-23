@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function CalculatorWithHistory() {
   const [num1, setNum1] = useState("");
   const [num2, setNum2] = useState("");
   const [result, setResult] = useState("");
+  const [data, setData] = useState([])
 
   const buttonPressed = (operation) => {
     const num1Value = parseFloat(num1);
@@ -20,9 +21,12 @@ export default function CalculatorWithHistory() {
     } else {
       setResult("Syötä kelvolliset numerot");
     }
+
+    setData([...data, {key: result}])
   };
 
   return (
+    
     <View style={styles.container}>
       <Text>Result: {result}</Text>
 
@@ -43,6 +47,15 @@ export default function CalculatorWithHistory() {
       <Button onPress={() => buttonPressed("+")} title="+" />
       <Button onPress={() => buttonPressed("-")} title="-" />
 
+      <Text>Historia</Text>
+      <FlatList style={styles.list}
+        data={data}
+        renderItem={({ item }) =>
+          <Text>{item.key}</Text>
+        }
+        keyExtractor={(item, index) => index.toString()}
+      />
+
       <StatusBar style="auto" />
     </View>
   );
@@ -61,5 +74,8 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10,
     width: 200,
-  },
+  },list:{
+
+  }
+
 });
