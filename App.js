@@ -1,33 +1,36 @@
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
 
-export default function CalculatorWithHistory() {
-  const [num1, setNum1] = useState("");
-  const [num2, setNum2] = useState("");
-  const [result, setResult] = useState("");
-  const [data, setData] = useState([])
+const Stack = createNativeStackNavigator();
+
+function CalculatorScreen({ navigation }) {
+  const [num1, setNum1] = useState('');
+  const [num2, setNum2] = useState('');
+  const [result, setResult] = useState('');
+  const [data, setData] = useState([]);
 
   const buttonPressed = (operation) => {
     const num1Value = parseFloat(num1);
     const num2Value = parseFloat(num2);
 
     if (!isNaN(num1Value) && !isNaN(num2Value)) {
-      if (operation === "+") {
-        setResult(`${num1Value} ${operation} ${num2Value} = ${num1Value + num2Value}`);
-        
-      } else if (operation === "-") {
-        setResult(`${num1Value} ${operation} ${num2Value} = ${num1Value - num2Value}`);
+      let newResult = '';
+      if (operation === '+') {
+        newResult = `${num1Value} ${operation} ${num2Value} = ${num1Value + num2Value}`;
+      } else if (operation === '-') {
+        newResult = `${num1Value} ${operation} ${num2Value} = ${num1Value - num2Value}`;
       }
+      setData([...data, { key: newResult }]);
+      setResult(newResult);
     } else {
-      setResult("Syötä kelvolliset numerot");
+      setResult('Syötä kelvolliset numerot');
     }
-
-    setData([...data, {key: result}])
   };
 
   return (
-    
     <View style={styles.container}>
       <Text>Result: {result}</Text>
 
@@ -45,20 +48,40 @@ export default function CalculatorWithHistory() {
         keyboardType="numeric"
       />
 
-      <Button onPress={() => buttonPressed("+")} title="+" />
-      <Button onPress={() => buttonPressed("-")} title="-" />
+      <Button onPress={() => buttonPressed('+')} title="+" />
+      <Button onPress={() => buttonPressed('-')} title="-" />
 
-      <Text>Historia</Text>
-      <FlatList style={styles.list}
-        data={data}
-        renderItem={({ item }) =>
-          <Text>{item.key}</Text>
-        }
-        keyExtractor={(item, index) => index.toString()}
-      />
+      <Button onPress={() => navigation.navigate('History', { data: data })} title="History" />
 
       <StatusBar style="auto" />
     </View>
+  );
+}
+
+function HistoryScreen({ route }) {
+  const data = route.params.data || [];
+
+  return (
+    <View>
+      <Text>History</Text>
+      <FlatList
+        style={styles.list}
+        data={data}
+        renderItem={({ item }) => <Text>{item.key}</Text>}
+        keyExtractor={(item, index) => index.toString()}
+      />
+    </View>
+  );
+}
+
+export default function CalculatorWithHistory() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Calculator" component={CalculatorScreen} />
+        <Stack.Screen name="History" component={HistoryScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -75,8 +98,12 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10,
     width: 200,
-  },list:{
-
-  }
-
+  },
+  list: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    margin: 10,
+    width: 200,
+  },
 });
